@@ -123,10 +123,9 @@ export class ClusterRoleStack extends cdk.Stack {
                 StringEquals: {
                     'sts:ExternalId': castAiClusterId,
                 },
-            }), // Allow a specific user or service with conditions
+            }),
             inlinePolicies: {
                 CastEKSRestrictedAccess: iam.PolicyDocument.fromJson(CastEKSRestrictedAccess),
-                //CastEKSPolicy: iam.PolicyDocument.fromJson(CastEKSPolicy),
             },
             managedPolicies: [
                 iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ReadOnlyAccess'), iam.ManagedPolicy.fromAwsManagedPolicyName('IAMReadOnlyAccess'),
@@ -222,8 +221,6 @@ export class EksSecurityGroupStack extends cdk.Stack {
     }
 }
 
-//}
-
 // Define the CDK app and stack outside of the class
 const app = new cdk.App();
 
@@ -234,7 +231,7 @@ const region = cdk.Aws.REGION; // Region (use CDK's region)
 const accountNumber = cdk.Aws.ACCOUNT_ID; // AWS Account number
 const clusterName = 'eks-10101-sar'; // Cluster 
 const castAiClusterId = '9f3e2cc0-xxxx-411c-9208-ae8bb18986cb'; // CAST AI cluster ID
-const userArn = 'arn:aws:iam::809060229965:user/cast-crossrole-9f3e2cc0-8c14-411c-9208-ae8bb18986cb'; // User ARN (this will be dynamically determined in a real case)
+const userArn = 'arn:aws:iam::809060229965:user/cast-crossrole-9f3e2cc0-8c14-411c-9208-ae8bb18986cb'; // User ARN
 
 new Ec2InstanceProfileStack(app, 'Ec2InstanceProfileStack', ARN_PARTITION, clusterVpc, region, accountNumber, clusterName, castAiClusterId, userArn, {
     env: {

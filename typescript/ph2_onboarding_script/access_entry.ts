@@ -6,7 +6,6 @@ export class AccessEntryCdkStack extends cdk.Stack {
     constructor(scope: Construct, id: string, clusterName: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        // The code that defines your stack goes here
         try {
             // Define the EKS cluster
             const cluster = eks.Cluster.fromClusterAttributes(this, 'Cluster', {
@@ -30,7 +29,7 @@ export class AccessEntryCdkStack extends cdk.Stack {
         }
     }
 }
-const clusterName = 'eks-10101-sar'; // Cluster 
+const clusterName = 'eks-10101-sar';
 const app = new cdk.App();
 new AccessEntryCdkStack(app, 'AccessEntryCdkStack', clusterName, {
     env: {

@@ -2,11 +2,11 @@ import axios from 'axios';
 
 const sendPostRequest = async () => {
   // Insert the role ARN created earlier
-  const ROLE_ARN = "arn:aws:iam::123456789012:role/YourRoleName";
-  
+  const ROLE_ARN = "arn:aws:iam::050451381948:role/cast-eks-eks-10101-sar-cluster-role-9f3e2cc0";
+
   // Insert the castai cluster ID
-  const CLUSTER_ID = "<<CLUSTER_ID>>"
-  const CAST_API_KEY = "<<CAST_API_KEY>>"
+  const CLUSTER_ID = "9f3e2cc0-8c14-411c-9208-ae8bb18986cb"
+  const CAST_API_KEY = "<Add API KEY>"
 
   // API endpoint
   const url = `https://api.cast.ai/v1/kubernetes/external-clusters/${CLUSTER_ID}`;

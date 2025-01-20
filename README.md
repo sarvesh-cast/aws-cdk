@@ -99,12 +99,12 @@ metadata:
 
 ### Step 3 : Update variables in variable.ts 
 
-Update below values in variable.ts. These values can be obtained from CAST CONSOLE UI - Enable CAST AI button. 
+Update below values in variable.ts. These values can be obtained from CAST CONSOLE UI - Enable CAST AI button and your EKS Cluster details:
 ```
-ClusterName
-CastAiClusterId
-UserArn
-CastApiKey
+ClusterName:
+ClusterVpcId:
+CastAiClusterId:
+CastApiKey:
 
 Run cdk synth --all (Verify vars such as region,cluster etc)
 ```

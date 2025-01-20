@@ -1,37 +1,61 @@
-import axios from 'axios';
+import * as cdk from 'aws-cdk-lib';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as path from 'path';
+import * as cr from 'aws-cdk-lib/custom-resources';
+import { variables } from './variables';
 
-const sendPostRequest = async () => {
-  const ROLE_ARN = "arn:aws:iam::050451381948:role/cast-eks-eks-10101-sar-cluster-role-9f3e2cc0";
+const AwsAccount = process.env.CDK_DEFAULT_ACCOUNT
+const ClusterName = variables.ClusterName;
+const CastAiClusterId = variables.CastAiClusterId;
+const CastApiKey = variables.CastApiKey;
 
-  const CLUSTER_ID = "9f3e2cc0-8c14-411c-9208-ae8bb18986cb"
-  const CAST_API_KEY = "<Add API KEY>"
+export class PostLambdaStack extends cdk.Stack {
+    constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+        super(scope, id, props);
 
-  // API endpoint
-  const url = `https://api.cast.ai/v1/kubernetes/external-clusters/${CLUSTER_ID}`;
+        const postLambda = new lambda.Function(this, 'PostLambda', {
+            runtime: lambda.Runtime.NODEJS_22_X,
+            handler: 'postcall.handler',
+            code: lambda.Code.fromAsset(path.join(__dirname, './lambda')), // Path to Lambda code
+            environment: {
+                CastApiKey: CastApiKey,
+            },
+        });
 
-  // Request body
-  const requestBody = {
-    eks: {
-      assumeRoleArn: ROLE_ARN
+        // Add IAM permissions to the Lambda function
+        // postLambda.addToRolePolicy(
+        //     new iam.PolicyStatement({
+        //         actions: ['sts:AssumeRole'],
+        //         resources: [`arn:aws:iam::${cdk.Aws.ACCOUNT_ID}:role/cast-eks-*`],
+        //     }),
+        // );
+
+        // Create a custom resource provider
+        const provider = new cr.Provider(this, 'PostLambdaProvider', {
+            onEventHandler: postLambda, // The Lambda function to run
+        });
+
+        new cdk.CustomResource(this, 'PostLambdaTrigger', {
+            serviceToken: provider.serviceToken,
+            properties: {
+                ClusterName: ClusterName,
+                CastAiClusterId: CastAiClusterId,
+                AwsAccount: cdk.Aws.ACCOUNT_ID,
+                ArnPartition: cdk.Aws.PARTITION,
+            },
+        });
+
+        // Output the Lambda function ARN for debugging purposes
+        new cdk.CfnOutput(this, 'PostLambdaArn', {
+            value: postLambda.functionArn,
+        });
     }
-  };
-
-  try {
-    const response = await axios.post(url, requestBody, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': CAST_API_KEY,
-      },
-    });
-
-    console.log('Response:', response.data);
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error('Error:', error.response?.data || error.message);
-    } else {
-      console.error('Unexpected Error:', error);
-    }
-  }
-};
-
-sendPostRequest();
+}
+const app = new cdk.App();
+const ClusterShortName = `${ClusterName.slice(0, 30)}`
+const PostLambda_Stack = new PostLambdaStack(app, `${ClusterShortName}-CastAiPostLambdaStack`, {
+    env: {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: process.env.CDK_DEFAULT_REGION,
+    },
+});;

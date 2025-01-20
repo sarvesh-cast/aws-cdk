@@ -218,50 +218,12 @@ export class AccessEntryStack extends cdk.Stack {
     }
 }
 
-//     // Define the CAST Cluster role
-//     const ROLE_ARN = cdk.Fn.importValue('CastClusterRole');
-//     console.log(ROLE_ARN);
-//     console.log("words");
-//     //const ROLE_ARN = "arn:aws:iam::050451381948:role/cast-eks-eks-10101-sar-cluster-role-9f3e2cc0";
-
-//     // Insert the castai cluster ID
-//     const CLUSTER_ID = CastAiClusterId
-//     const CAST_API_KEY = ""
-
-//     // API endpoint
-//     const url = `https://api.cast.ai/v1/kubernetes/external-clusters/${CLUSTER_ID}`;
-
-//     // Request body
-//     const requestBody = {
-//         eks: {
-//             assumeRoleArn: ROLE_ARN
-//         }
-//     };
-
-// try {
-//     const response = await axios.post(url, requestBody, {
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-API-Key': CAST_API_KEY,
-//         },
-//     });
-
-//     console.log('Response:', response.data);
-// } catch (error) {
-//     if (axios.isAxiosError(error)) {
-//         console.error('Error:', error.response?.data || error.message);
-//     } else {
-//         console.error('Unexpected Error:', error);
-//     }
-// }
-//};
-
-
 // Runtime Parameters
 const region = cdk.Aws.REGION; // Region
 const accountNumber = cdk.Aws.ACCOUNT_ID; // AWS Account number
 const ARN_PARTITION = cdk.Aws.PARTITION; // AWS or AWS GovCloud
 
+// Parameters
 const ClusterName = variables.ClusterName;
 const CastAiClusterId = variables.CastAiClusterId;
 const UserArn = variables.UserArn;

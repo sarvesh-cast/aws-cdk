@@ -219,7 +219,7 @@ export class PostLambdaStack extends cdk.Stack {
     constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const castIamRoleArn = cdk.Fn.importValue(`${ClusterName}-Ec2InstanceProfileRoleArn`)
+        const castIamRoleArn = cdk.Fn.importValue(`${ClusterName}-CastClusterRole`)
 
         const postLambda = new lambda.Function(this, 'PostLambda', {
             runtime: lambda.Runtime.NODEJS_22_X,

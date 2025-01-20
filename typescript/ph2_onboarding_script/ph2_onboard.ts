@@ -169,12 +169,12 @@ export class EksSecurityGroupStack extends cdk.Stack {
 
         // Allow ingress traffic only from the same security group
         CastNodeSecurityGroup.addIngressRule(
-            CastNodeSecurityGroup, // Peer is the same security group
-            ec2.Port.allTraffic(), // Allow all traffic
+            CastNodeSecurityGroup,
+            ec2.Port.allTraffic(),
             'Allow traffic from the same security group'
         );
 
-        // Output the security group ID for reference
+        // security group ID 
         new cdk.CfnOutput(this, 'CastNodeSecurityGroupId', {
             value: CastNodeSecurityGroup.securityGroupId,
             description: 'The ID of the CAST AI node security group',
@@ -194,12 +194,10 @@ export class AccessEntryStack extends cdk.Stack {
         super(scope, id, props);
 
         try {
-            // Define the EKS cluster
             const cluster = eks.Cluster.fromClusterAttributes(this, 'Cluster', {
                 clusterName: ClusterName
             });
 
-            // Define the Cast IAM Instance role ARN to grant access
             const Ec2InstanceProfileRoleArn = cdk.Fn.importValue('Ec2InstanceProfileRoleArn');
 
             const accessScope: eks.AccessScope = {
@@ -211,7 +209,6 @@ export class AccessEntryStack extends cdk.Stack {
                 principal: Ec2InstanceProfileRoleArn,
                 accessEntryType: eks.AccessEntryType.EC2_LINUX,
             });
-            //sendPostRequest();
         } catch (e: unknown) {
             console.error('Failed to add access entry to the cluster:', e);
         }

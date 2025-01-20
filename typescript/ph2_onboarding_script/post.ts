@@ -27,15 +27,6 @@ export class PostLambdaStack extends cdk.Stack {
             },
         });
 
-        // Add IAM permissions to the Lambda function
-        // postLambda.addToRolePolicy(
-        //     new iam.PolicyStatement({
-        //         actions: ['sts:AssumeRole'],
-        //         resources: [`arn:aws:iam::${cdk.Aws.ACCOUNT_ID}:role/cast-eks-*`],
-        //     }),
-        // );
-
-        // Create a custom resource provider
         const provider = new cr.Provider(this, 'PostLambdaProvider', {
             onEventHandler: postLambda, // The Lambda function to run
         });
@@ -44,7 +35,6 @@ export class PostLambdaStack extends cdk.Stack {
             serviceToken: provider.serviceToken,
         });
 
-        // Output the Lambda function ARN for debugging purposes
         new cdk.CfnOutput(this, 'PostLambdaArn', {
             value: postLambda.functionArn,
         });

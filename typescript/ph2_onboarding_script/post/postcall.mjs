@@ -1,4 +1,4 @@
-export const handler = async(event) => {
+export const handler = async (event) => {
     const ClusterName = process.env.ClusterName;
     const CastAiClusterId = process.env.CastAiClusterId;
     const AwsAccount = process.env.AwsAccount;
@@ -7,15 +7,15 @@ export const handler = async(event) => {
     const RoleName = `cast-eks-${ClusterName.slice(0, 30)}-cluster-role-${CastAiClusterId.slice(0, 8)}`;
     const RoleArn = `arn:${ArnPartition}:iam::${AwsAccount}:role/${RoleName}`;
     const CastApiUrl = `https://api.cast.ai/v1/kubernetes/external-clusters/${CastAiClusterId}`;
-  
+
     const requestBody = {
         eks: {
             assumeRoleArn: RoleArn,
         },
     };
-  
+
     console.log('Request Body:', requestBody);
-  
+
     try {
         console.log('******* Running post block *******');
         const response = await fetch(CastApiUrl, {
@@ -40,4 +40,4 @@ export const handler = async(event) => {
             body: JSON.stringify({ error: error.message }),
         };
     }
-  };
+};

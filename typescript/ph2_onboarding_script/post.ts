@@ -16,9 +16,14 @@ export class PostLambdaStack extends cdk.Stack {
         const postLambda = new lambda.Function(this, 'PostLambda', {
             runtime: lambda.Runtime.NODEJS_22_X,
             handler: 'postcall.handler',
+            timeout: cdk.Duration.seconds(30),
             code: lambda.Code.fromAsset(path.join(__dirname, './lambda')), // Path to Lambda code
             environment: {
                 CastApiKey: CastApiKey,
+                ClusterName: ClusterName,
+                CastAiClusterId: CastAiClusterId,
+                AwsAccount: cdk.Aws.ACCOUNT_ID,
+                ArnPartition: cdk.Aws.PARTITION,
             },
         });
 
@@ -37,12 +42,6 @@ export class PostLambdaStack extends cdk.Stack {
 
         new cdk.CustomResource(this, 'PostLambdaTrigger', {
             serviceToken: provider.serviceToken,
-            properties: {
-                ClusterName: ClusterName,
-                CastAiClusterId: CastAiClusterId,
-                AwsAccount: cdk.Aws.ACCOUNT_ID,
-                ArnPartition: cdk.Aws.PARTITION,
-            },
         });
 
         // Output the Lambda function ARN for debugging purposes

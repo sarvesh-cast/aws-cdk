@@ -1,16 +1,12 @@
 export const handler = async (event) => {
-    const ClusterName = process.env.ClusterName;
     const CastAiClusterId = process.env.CastAiClusterId;
-    const AwsAccount = process.env.AwsAccount;
-    const ArnPartition = process.env.ArnPartition;
     const CastApiKey = process.env.CastApiKey;
-    const RoleName = `cast-eks-${ClusterName.slice(0, 30)}-cluster-role-${CastAiClusterId.slice(0, 8)}`;
-    const RoleArn = `arn:${ArnPartition}:iam::${AwsAccount}:role/${RoleName}`;
+    const IamRoleArn = process.env.IamRoleArn;
     const CastApiUrl = `https://api.cast.ai/v1/kubernetes/external-clusters/${CastAiClusterId}`;
 
     const requestBody = {
         eks: {
-            assumeRoleArn: RoleArn,
+            assumeRoleArn: IamRoleArn,
         },
     };
 

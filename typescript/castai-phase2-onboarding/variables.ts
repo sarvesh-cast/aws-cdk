@@ -1,6 +1,6 @@
 export const variables = {
     ClusterName: '',
+    ClusterVpcId: '',
     CastAiClusterId: '',
-    UserArn: '',
     CastApiKey: ''
 };

@@ -3,6 +3,9 @@ import { Construct } from 'constructs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as eks from 'aws-cdk-lib/aws-eks';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as path from 'path';
+import * as cr from 'aws-cdk-lib/custom-resources';
 import { variables } from './variables';
 
 export class ClusterRoleStack extends cdk.Stack {
@@ -149,9 +152,7 @@ export class EksSecurityGroupStack extends cdk.Stack {
 
         const clusterVpc = ec2.Vpc.fromLookup(this, 'EksClusterVpc', {
             isDefault: false, // Adjust as per your setup
-            tags: {
-                'alpha.eksctl.io/cluster-name': ClusterName,
-            },
+            vpcId: ClusterVpcId,
         });
         const vpcId = clusterVpc.vpcId;
 
@@ -214,6 +215,41 @@ export class AccessEntryStack extends cdk.Stack {
     }
 }
 
+export class PostLambdaStack extends cdk.Stack {
+    constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+        super(scope, id, props);
+
+        const castIamRoleArn = cdk.Fn.importValue(`${ClusterName}-Ec2InstanceProfileRoleArn`)
+
+        const postLambda = new lambda.Function(this, 'PostLambda', {
+            runtime: lambda.Runtime.NODEJS_22_X,
+            handler: 'postcall.handler',
+            timeout: cdk.Duration.seconds(30),
+            code: lambda.Code.fromAsset(path.join(__dirname, './cast-api-post-call')), // Path to Lambda code
+            environment: {
+                CastApiKey: CastApiKey,
+                ClusterName: ClusterName,
+                CastAiClusterId: CastAiClusterId,
+                AwsAccount: cdk.Aws.ACCOUNT_ID,
+                ArnPartition: cdk.Aws.PARTITION,
+                IamRoleArn: castIamRoleArn,
+            },
+        });
+
+        const provider = new cr.Provider(this, 'PostLambdaProvider', {
+            onEventHandler: postLambda, // The Lambda function to run
+        });
+
+        new cdk.CustomResource(this, 'PostLambdaTrigger', {
+            serviceToken: provider.serviceToken,
+        });
+
+        new cdk.CfnOutput(this, 'PostLambdaArn', {
+            value: postLambda.functionArn,
+        });
+    }
+}
+
 // Runtime Parameters
 const region = cdk.Aws.REGION; // Region
 const accountNumber = cdk.Aws.ACCOUNT_ID; // AWS Account number
@@ -221,7 +257,8 @@ const ARN_PARTITION = cdk.Aws.PARTITION; // AWS or AWS GovCloud
 
 const ClusterName = variables.ClusterName;
 const CastAiClusterId = variables.CastAiClusterId;
-const UserArn = variables.UserArn;
+const ClusterVpcId = variables.ClusterVpcId;
+const UserArn = `arn:aws:iam::809060229965:user/cast-crossrole-${CastAiClusterId}`
 const CastApiKey = variables.CastApiKey;
 const ClusterShortName = `${ClusterName.slice(0, 30)}`
 console.log(`Cluster Name: ${ClusterName}`);
@@ -258,5 +295,13 @@ const AccessEntry_Stack = new AccessEntryStack(app, `${ClusterShortName}-CastAiA
     },
 });;
 
+const PostLambda_Stack = new PostLambdaStack(app, `${ClusterShortName}-CastAiPostLambdaStack`, {
+    env: {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: process.env.CDK_DEFAULT_REGION,
+    },
+});;
+
 ClusterRole_Stack.addDependency(EksSecurityGroup_Stack)
 AccessEntry_Stack.addDependency(Ec2InstanceProfile_Stack)
+PostLambda_Stack.addDependency(AccessEntry_Stack)

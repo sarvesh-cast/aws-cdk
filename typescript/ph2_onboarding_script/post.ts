@@ -1,10 +1,8 @@
 import axios from 'axios';
 
 const sendPostRequest = async () => {
-  // Insert the role ARN created earlier
   const ROLE_ARN = "arn:aws:iam::050451381948:role/cast-eks-eks-10101-sar-cluster-role-9f3e2cc0";
 
-  // Insert the castai cluster ID
   const CLUSTER_ID = "9f3e2cc0-8c14-411c-9208-ae8bb18986cb"
   const CAST_API_KEY = "<Add API KEY>"
 

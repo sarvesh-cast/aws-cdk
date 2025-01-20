@@ -257,7 +257,7 @@ export class AccessEntryStack extends cdk.Stack {
 //};
 
 
-// Parameters
+// Runtime Parameters
 const region = cdk.Aws.REGION; // Region
 const accountNumber = cdk.Aws.ACCOUNT_ID; // AWS Account number
 const ARN_PARTITION = cdk.Aws.PARTITION; // AWS or AWS GovCloud

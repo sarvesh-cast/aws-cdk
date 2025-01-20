@@ -2,14 +2,17 @@
 
 # AWS Typescript CDK - CAST AI Phase 2 onboarding script
 
+## Environment Setup
 Dependency: AWS Typescript CDK V2
+Boostrap cdk env using : cdk init app --language typescript
+Configure app: "app": "npx ts-node --prefer-ts-exts ph2_onboard.ts",
 
 The CAST AI Phase 2 onboarding script creates following AWS resources 
 1. CAST EC2 Instance profile
 2. CAST Cluster role
 3. CAST EKS node security group
 4. Access entry for EKS cluster 
-
+5. Post call to CAST API using lambda
 
 ## EKS and CAST AI example for onboarding flow
 
@@ -97,19 +100,24 @@ metadata:
 ### Step 3 : Update variables in variable.ts 
 
 Update below values in variable.ts. These values can be obtained from CAST CONSOLE UI - Enable CAST AI button. 
-
+```
 ClusterName
 CastAiClusterId
 UserArn
 CastApiKey
 
 Run cdk synth --all (Verify vars such as region,cluster etc)
+```
 
 ### Step 4: Run cdk synth --all
+```
 Execute cdk synth --all, Post successful Plan - Verify region/cluster etc
+```
 
 ### Step 5: Run cdk deploy --all
+```
 Execute cdk deploy --all, Post successful apply - CAST Console UI will be in `Connecting` state.
+```
 
 ### Step 6: Deploy Helm chart of CAST Components
 Coponents: `castai-cluster-controller`,`castai-evictor`, `castai-spot-handler`, `castai-kvisor`, `castai-workload-autoscaler`, `castai-pod-pinner` \

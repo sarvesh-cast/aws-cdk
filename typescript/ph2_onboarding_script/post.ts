@@ -17,7 +17,7 @@ export class PostLambdaStack extends cdk.Stack {
             runtime: lambda.Runtime.NODEJS_22_X,
             handler: 'postcall.handler',
             timeout: cdk.Duration.seconds(30),
-            code: lambda.Code.fromAsset(path.join(__dirname, './lambda')), // Path to Lambda code
+            code: lambda.Code.fromAsset(path.join(__dirname, './post')), // Path to Lambda code
             environment: {
                 CastApiKey: CastApiKey,
                 ClusterName: ClusterName,

@@ -11,7 +11,7 @@ export class ClusterRoleStack extends cdk.Stack {
 
         // Role name
         const roleName = `cast-eks-${ClusterName.slice(0, 30)}-cluster-role-${CastAiClusterId.slice(0, 8)}`;
-        const clusterVpc = cdk.Fn.importValue('ClusterVpcId');
+        const clusterVpc = cdk.Fn.importValue(`${ClusterName}-ClusterVpcId`);
 
         // Inline Policy JSON
         const CastEKSRestrictedAccess = {
@@ -71,7 +71,7 @@ export class ClusterRoleStack extends cdk.Stack {
                     Effect: 'Allow',
                     Action: ['eks:Describe*', 'eks:List*', 'eks:TagResource', 'eks:UntagResource'],
                     Resource: [`arn:aws:eks:${region}:${accountNumber}:cluster/${ClusterName}`,
-                    `arn:aws:eks:${region}:${accountNumber}:nodegroup/${ClusterName}/*/*`,
+                    `arn:aws:eks:${region}:${accountNumber}:nodegroup/${ClusterName}/*/* `,
                     ],
                 },
             ],
@@ -100,14 +100,11 @@ export class ClusterRoleStack extends cdk.Stack {
         new cdk.CfnOutput(this, 'CastClusterRoleArn', {
             value: role.roleArn,
             description: 'The ARN of the CAST Assume IAM Role',
-            exportName: 'CastClusterRole',
+            exportName: `${ClusterName}-CastClusterRole`,
         });
-        const RoleArn = cdk.Fn.importValue('CastClusterRole');
+        const RoleArn = cdk.Fn.importValue(`${ClusterName}-CastClusterRole`);
 
         console.log(`CastClusterRoleArn: ${RoleArn}`)
-        const fs = require('fs');
-        const output = RoleArn;
-        fs.writeFileSync('output.json', JSON.stringify({ output }));
     }
 }
 
@@ -139,7 +136,7 @@ export class Ec2InstanceProfileStack extends cdk.Stack {
         new cdk.CfnOutput(this, 'Ec2InstanceProfileRoleArn', {
             value: ec2Role.roleArn,
             description: 'The ARN of the IAM Role',
-            exportName: 'Ec2InstanceProfileRoleArn',
+            exportName: `${ClusterName}-Ec2InstanceProfileRoleArn`,
         });
     }
 }
@@ -169,22 +166,22 @@ export class EksSecurityGroupStack extends cdk.Stack {
 
         // Allow ingress traffic only from the same security group
         CastNodeSecurityGroup.addIngressRule(
-            CastNodeSecurityGroup,
-            ec2.Port.allTraffic(),
+            CastNodeSecurityGroup, // Peer is the same security group
+            ec2.Port.allTraffic(), // Allow all traffic
             'Allow traffic from the same security group'
         );
 
-        // security group ID 
+        // Output the security group ID for reference
         new cdk.CfnOutput(this, 'CastNodeSecurityGroupId', {
             value: CastNodeSecurityGroup.securityGroupId,
             description: 'The ID of the CAST AI node security group',
-            exportName: 'CastNodeSecurityGroupId',
+            exportName: `${ClusterName}-CastNodeSecurityGroupId`,
         });
 
         new cdk.CfnOutput(this, 'ClusterVpcId', {
             value: vpcId,
             description: 'VPC ID',
-            exportName: 'ClusterVpcId',
+            exportName: `${ClusterName}-ClusterVpcId`,
         });
     }
 }
@@ -194,11 +191,13 @@ export class AccessEntryStack extends cdk.Stack {
         super(scope, id, props);
 
         try {
+            // Define the EKS cluster
             const cluster = eks.Cluster.fromClusterAttributes(this, 'Cluster', {
                 clusterName: ClusterName
             });
 
-            const Ec2InstanceProfileRoleArn = cdk.Fn.importValue('Ec2InstanceProfileRoleArn');
+            // Define the Cast IAM Instance role ARN to grant access
+            const Ec2InstanceProfileRoleArn = cdk.Fn.importValue(`${ClusterName}-Ec2InstanceProfileRoleArn`);
 
             const accessScope: eks.AccessScope = {
                 type: eks.AccessScopeType.CLUSTER
@@ -220,10 +219,10 @@ const region = cdk.Aws.REGION; // Region
 const accountNumber = cdk.Aws.ACCOUNT_ID; // AWS Account number
 const ARN_PARTITION = cdk.Aws.PARTITION; // AWS or AWS GovCloud
 
-// Parameters
 const ClusterName = variables.ClusterName;
 const CastAiClusterId = variables.CastAiClusterId;
 const UserArn = variables.UserArn;
+const CastApiKey = variables.CastApiKey;
 const ClusterShortName = `${ClusterName.slice(0, 30)}`
 console.log(`Cluster Name: ${ClusterName}`);
 console.log(`CAST AI Cluster ID: ${CastAiClusterId}`);

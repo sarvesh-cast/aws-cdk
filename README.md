@@ -13,7 +13,7 @@ The CAST AI Phase 2 onboarding script creates following AWS resources
 
 ## EKS and CAST AI example for onboarding flow
 
-## GitOps flow 
+## CDK-GitOps flow 
 
 AWS CDK Managed ==>  IAM roles, CAST AI Node Configuration, CAST Node Templates and CAST Autoscaler policies
 

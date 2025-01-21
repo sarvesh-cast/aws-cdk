@@ -105,9 +105,8 @@ export class ClusterRoleStack extends cdk.Stack {
             description: 'The ARN of the CAST Assume IAM Role',
             exportName: `${ClusterName}-CastClusterRole`,
         });
-        const RoleArn = cdk.Fn.importValue(`${ClusterName}-CastClusterRole`);
+        const RoleArn = cdk.Fn.importValue(`${ClusterName}--CastClusterRole`);
 
-        console.log(`CastClusterRoleArn: ${RoleArn}`)
     }
 }
 
@@ -115,7 +114,7 @@ export class Ec2InstanceProfileStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        // Role name should follow EXACT same format
+        // (Hard Requirement) Role name should follow EXACT FORMAT
         const roleName = `cast-${ClusterName.slice(0, 40)}-eks-${CastAiClusterId.slice(0, 8)}`;
 
         const ec2Role = new iam.Role(this, 'Ec2InstanceRole', {
@@ -192,7 +191,6 @@ export class AccessEntryStack extends cdk.Stack {
         super(scope, id, props);
 
         try {
-            // Define the EKS cluster
             const cluster = eks.Cluster.fromClusterAttributes(this, 'Cluster', {
                 clusterName: ClusterName
             });
@@ -251,9 +249,9 @@ export class PostLambdaStack extends cdk.Stack {
 }
 
 // Runtime Parameters
-const region = cdk.Aws.REGION; // Region
-const accountNumber = cdk.Aws.ACCOUNT_ID; // AWS Account number
-const ARN_PARTITION = cdk.Aws.PARTITION; // AWS or AWS GovCloud
+const region = cdk.Aws.REGION;
+const accountNumber = cdk.Aws.ACCOUNT_ID;
+const ARN_PARTITION = cdk.Aws.PARTITION;
 
 const ClusterName = variables.ClusterName;
 const CastAiClusterId = variables.CastAiClusterId;

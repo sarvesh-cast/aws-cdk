@@ -5,7 +5,7 @@
 ## Environment Setup
 Dependency: AWS Typescript CDK V2
 Boostrap cdk env using : cdk init app --language typescript
-Configure app: "app": "npx ts-node --prefer-ts-exts ph2_onboard.ts",
+Configure app: "app": "npx ts-node --prefer-ts-exts castai-phase2-onboarding.ts",
 
 The CAST AI Phase 2 onboarding script creates following AWS resources 
 1. CAST EC2 Instance profile

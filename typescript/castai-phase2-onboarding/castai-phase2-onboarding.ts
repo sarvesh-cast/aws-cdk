@@ -105,7 +105,7 @@ export class ClusterRoleStack extends cdk.Stack {
             description: 'The ARN of the CAST Assume IAM Role',
             exportName: `${ClusterName}-CastClusterRole`,
         });
-        const RoleArn = cdk.Fn.importValue(`${ClusterName}--CastClusterRole`);
+        const RoleArn = cdk.Fn.importValue(`${ClusterName}-CastClusterRole`);
 
     }
 }

@@ -13,7 +13,7 @@ export const handler = async (event) => {
     console.log('Request Body:', requestBody);
 
     try {
-        console.log('******* Running post block *******');
+        console.log('******* Executing Post Block *******');
         const response = await fetch(CastApiUrl, {
             method: 'POST',
             body: JSON.stringify(requestBody),

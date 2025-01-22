@@ -4,7 +4,9 @@
 
 ## Environment Setup
 Dependency: AWS Typescript CDK V2
+
 Boostrap cdk env using : cdk init app --language typescript
+
 Configure app: "app": "npx ts-node --prefer-ts-exts castai-phase2-onboarding.ts",
 
 The CAST AI Phase 2 onboarding script creates following AWS resources 
@@ -70,7 +72,6 @@ Prerequisites:
 - CAST AI account
 - Obtained CAST AI Key [API Access key](https://docs.cast.ai/docs/authentication#obtaining-api-access-key) with Full Access
 
-
 ### Step 1: Get EKS cluster authentication mode
 ```
 CLUSTER_NAME=""
@@ -83,10 +84,12 @@ echo "Authentication mode is $current_auth_mode"
 ### Step 2: If EKS AUTH mode is API/API_CONFIGMAP, This step can be SKIPPED.
 #### User to add cast role in aws-auth configmap, configmap may have other entries, so add the below role to it.
 ```
+INSTANCE_PROFILE="cast-${CLUSTER_NAME:0:40}-eks-${CASTAI_CLUSTER_ID:0:8}"
+
 apiVersion: v1
 data:
   mapRoles: |
-    - rolearn: arn:aws:iam::<accountid>:role/cast-eks-instance-<clustername>
+    - rolearn: arn:aws:iam::<accountid>:role/<INSTANCE_PROFILE>
       username: system:node:{{EC2PrivateDNSName}}
       groups:
       - system:bootstrappers
